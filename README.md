@@ -28,3 +28,12 @@ GitHub Pages(備援):三個檔案放進 repo 根目錄,Settings → Pages → So
 
 馬爾地夫配色(白沙底、深海藍文字、背景有陽光與海面漸層)。十一張手繪貼紙、
 頁尾有柯基與雙色布偶貓在散步。頁首右上連回工作作品集 sandyliuportfolio.com。
+
+小裝飾(都在 `index.html` 裡,沒有新增外部請求):
+
+- 「Off the clock」那條橫幅右邊有新北的即時時間,只用瀏覽器內建的 `Intl`。
+  不想要就刪掉 ribbon 裡的 `<span class="now">` 和上面那支小 `<script>`。
+- hero 右下角一枚貝殼、貼紙紙右下一顆海星,`.doodle` 那兩個 SVG,700px 以下自動收起來。
+- 頁尾海岸帶多了一艘遠方帆船(`.shore-boat`)和兩隻海鷗(`.shore-gulls`),
+  跟其他海岸元素一樣不吃滑鼠事件;`prefers-reduced-motion` 會關掉它們的漂移。
+- 兩顆 chip(地點、IG)前面各加了一個 13px 的線稿小圖示。
