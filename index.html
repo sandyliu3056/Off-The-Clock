@@ -80,11 +80,11 @@ body:after{content:"";position:fixed;z-index:-2;left:0;right:0;bottom:0;height:3
   border-bottom:3px solid var(--ink);color:#2F4A64;
   letter-spacing:.22em;text-transform:uppercase;font-size:11px;
   padding:9px 3vw}
-/* ribbon 右邊的小時鐘：顯示 Sandy 那邊現在幾點，讓 "Off the clock" 有個真的時間 */
+/* ribbon 右邊的小時鐘：看的人自己的時區、日期與時間，讓 "Off the clock" 有個真的時間 */
 .ribbon{display:flex;align-items:center;gap:10px}
-.ribbon .now{margin-left:auto;display:inline-flex;align-items:center;gap:6px;
-  letter-spacing:.1em;font-variant-numeric:tabular-nums;opacity:.86}
-.ribbon .now i{width:5px;height:5px;border-radius:50%;background:var(--coral);
+.ribbon .now{margin-left:auto;display:inline-flex;align-items:center;gap:7px;
+  letter-spacing:.1em;font-variant-numeric:tabular-nums;opacity:.86;white-space:nowrap}
+.ribbon .now i{flex:0 0 auto;width:5px;height:5px;border-radius:50%;background:var(--coral);
   animation:tick 2s steps(1,end) infinite}
 @keyframes tick{0%,50%{opacity:1}50.01%,100%{opacity:.3}}
 
@@ -242,7 +242,7 @@ footer span{opacity:.65;margin-left:auto}
   .chips{justify-content:center}
   .sheet{padding:24px 14px 18px}
   .doodle{display:none}
-  .ribbon .now{font-size:10px;letter-spacing:.06em}
+  .ribbon .now{font-size:10px;letter-spacing:.04em;gap:5px}
   .sticker{transform:none}
   .sticker:nth-child(odd),.sticker:nth-child(even){transform:none}
   .social a{width:100%;justify-content:center}
@@ -261,7 +261,7 @@ footer span{opacity:.65;margin-left:auto}
   </header>
 
   <div class="ribbon">Off the clock
-    <span class="now"><i aria-hidden="true"></i><span id="clock">New Taipei</span></span>
+    <span class="now"><i aria-hidden="true"></i><span id="clock"></span></span>
   </div>
 
   <div class="page">
@@ -486,27 +486,48 @@ footer span{opacity:.65;margin-left:auto}
 </main>
 
 <script>
-/* ── ribbon 右邊的當地時間 ────────────────────────────────────────
-   顯示新北現在幾點。只用瀏覽器內建的 Intl，沒有網路請求；
-   萬一環境不支援時區，就把整個小時鐘收起來，不留半截字。
+/* ── ribbon 右邊的時間 ────────────────────────────────────────────
+   顯示看的人自己的時區、日期與時間，例如「TAIPEI MON 24 AUG 03:46 GMT+8」。
+   時區、時刻都來自訪客的瀏覽器(系統時鐘 + Intl 解析出來的時區)，
+   所以不需要網路；環境給不出時區就只顯示日期時間，再不行就整塊收起來。
    要拿掉：刪掉這個 <script> 和 ribbon 裡的 <span class="now">。
 ──────────────────────────────────────────────────────────────── */
 (function () {
   var el = document.getElementById("clock");
   if (!el) return;
-  var fmt;
+
+  var day, clock, tz, city;
   try {
-    fmt = new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Asia/Taipei", hour: "2-digit", minute: "2-digit", hour12: false
-    });
-    fmt.format(new Date());
+    day = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "2-digit", month: "short" });
+    clock = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false });
+    day.format(new Date()); clock.format(new Date());
+    tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+    /* "Europe/London" → "London"；拿不到就不寫城市，不硬湊 */
+    city = tz ? tz.split("/").pop().replace(/_/g, " ") : "";
+    /* 有些瀏覽器還在回舊名，改成現在的市名 */
+    city = ({ Calcutta: "Kolkata", Saigon: "Ho Chi Minh City",
+              Rangoon: "Yangon", Kiev: "Kyiv" })[city] || city;
   } catch (e) {
     var box = el.parentNode;
     if (box) box.style.display = "none";
     return;
   }
+
+  /* 時區字樣走 shortOffset("GMT+8")；舊瀏覽器不吃就留空 */
+  function zone(d) {
+    try {
+      var parts = new Intl.DateTimeFormat("en-GB", { timeZoneName: "shortOffset" }).formatToParts(d);
+      for (var i = 0; i < parts.length; i++)
+        if (parts[i].type === "timeZoneName") return parts[i].value;
+    } catch (e) {}
+    return "";
+  }
+
   function tick() {
-    el.textContent = "New Taipei " + fmt.format(new Date());
+    var d = new Date();
+    /* en-GB 會給 "Mon, 24 Aug"，逗號在全大寫的橫幅裡有點礙眼，拿掉 */
+    var out = [city, day.format(d).replace(",", ""), clock.format(d), zone(d)];
+    el.textContent = out.filter(Boolean).join(" ");
     /* 對齊到下一個整分，時間不會晚一步才跳 */
     setTimeout(tick, 60000 - (Date.now() % 60000) + 250);
   }
