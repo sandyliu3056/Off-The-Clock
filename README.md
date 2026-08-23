@@ -1,6 +1,6 @@
 # Off The Clock
 
-Sandy Liu 的生活版單頁。單一 HTML,無外部相依 — 字型、頭像、favicon 都內嵌。
+Sandy Liu 的生活版單頁。單一 HTML。字型、頭像、favicon 都內嵌;唯一的外部請求是 Spotify 的官方 embed。
 
 ## 檔案
 - `index.html` — 整頁
@@ -23,5 +23,8 @@ GitHub Pages(備援):三個檔案放進 repo 根目錄,Settings → Pages → So
 作品集頁首右上那顆「Off the clock →」也指向這個網址,要一起改。
 
 ## 內容
+「On repeat」那張卡是 Spotify 官方 embed(California feat. Warren Hue),
+不是自架音檔 — 商業歌曲不能自己放上去。要換歌就改 iframe 網址最後那段 track ID。
+
 馬爾地夫配色(白沙底、深海藍文字、背景有陽光與海面漸層)。十一張手繪貼紙、
 頁尾有柯基與雙色布偶貓在散步。頁首右上連回工作作品集 sandyliuportfolio.com。
