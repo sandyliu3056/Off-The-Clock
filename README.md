@@ -31,11 +31,11 @@ GitHub Pages(備援):三個檔案放進 repo 根目錄,Settings → Pages → So
 
 小裝飾(都在 `index.html` 裡,沒有新增外部請求):
 
-- 「Off the clock」那條橫幅右邊是即時時間:新北的星期、日期、時刻與時區
-  (`NEW TAIPEI MON 24 AUG 03:46 GMT+8`)。訪客不在同一個時區時,左邊會多一段
-  他自己的時間(`YOURS 20:46 GMT+1`),手機版收起來免得那條擠爆。
-  時區寫死 `Asia/Taipei`,不跟著訪客跑;「現在幾點」則來自訪客電腦的系統時鐘,
-  再由 `Intl` 換算成台北時間 — 只用瀏覽器內建的 API,沒有網路請求。
+- 「Off the clock」那條橫幅右邊是即時時間,顯示的是**看的人自己**的時區、
+  星期、日期與時刻(`LOS ANGELES SUN 23 AUG 12:57 GMT-7`)。
+  城市名取自瀏覽器回報的時區(`Europe/London` → `London`),時刻來自系統時鐘,
+  全部走瀏覽器內建的 `Intl`,沒有網路請求;拿不到時區就只顯示日期時間,
+  連 `Intl` 都不支援就整塊收起來,不留半截字。
   不想要就刪掉 ribbon 裡的 `<span class="now">` 和上面那支小 `<script>`。
 - hero 右下角一枚貝殼、貼紙紙右下一顆海星,`.doodle` 那兩個 SVG,700px 以下自動收起來。
 - 頁尾海岸帶多了一艘遠方帆船(`.shore-boat`)和兩隻海鷗(`.shore-gulls`),
