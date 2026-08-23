@@ -80,6 +80,13 @@ body:after{content:"";position:fixed;z-index:-2;left:0;right:0;bottom:0;height:3
   border-bottom:3px solid var(--ink);color:#2F4A64;
   letter-spacing:.22em;text-transform:uppercase;font-size:11px;
   padding:9px 3vw}
+/* ribbon 右邊的小時鐘：顯示 Sandy 那邊現在幾點，讓 "Off the clock" 有個真的時間 */
+.ribbon{display:flex;align-items:center;gap:10px}
+.ribbon .now{margin-left:auto;display:inline-flex;align-items:center;gap:6px;
+  letter-spacing:.1em;font-variant-numeric:tabular-nums;opacity:.86}
+.ribbon .now i{width:5px;height:5px;border-radius:50%;background:var(--coral);
+  animation:tick 2s steps(1,end) infinite}
+@keyframes tick{0%,50%{opacity:1}50.01%,100%{opacity:.3}}
 
 .page{flex:1;padding:20px 3vw 34px;max-width:1040px;width:100%;margin:0 auto;
   display:flex;flex-direction:column;gap:16px}
@@ -103,6 +110,8 @@ body:after{content:"";position:fixed;z-index:-2;left:0;right:0;bottom:0;height:3
 a.chip{transition:background .16s ease,border-color .16s ease,color .16s ease}
 a.chip:hover{background:var(--blush);border-color:var(--ink);color:var(--ink)}
 a.chip:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.chip .ic{flex:0 0 auto;width:13px;height:13px;fill:none;stroke:currentColor;
+  stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 
 /* ── the sticker sheet: this page's one loud idea ───────────────────── */
 .sheet{position:relative;background:
@@ -114,6 +123,13 @@ a.chip:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
   transform:translateX(-50%) rotate(-1.6deg);background:var(--tape);opacity:.85;
   border-left:2px dashed rgba(93,85,79,.16);border-right:2px dashed rgba(93,85,79,.16)}
 .sheet ul{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:13px}
+/* 兩筆手繪小塗鴉：hero 右下的貝殼、貼紙紙右下的海星。
+   都塞在各自卡片的空白角落，不吃滑鼠事件，內容一多就被蓋住也無妨。 */
+.doodle{position:absolute;pointer-events:none;opacity:.4;
+  fill:none;stroke:var(--blush-deep);stroke-width:2.4;
+  stroke-linecap:round;stroke-linejoin:round}
+.hero .shell{right:20px;bottom:14px;width:30px;transform:rotate(-12deg)}
+.sheet .star{right:13px;bottom:9px;width:36px;transform:rotate(10deg);stroke:var(--gold);opacity:.5}
 
 .sticker{position:relative;background:var(--cream);border:2px solid #FFF;border-radius:14px;
   padding:13px 14px;display:flex;gap:12px;align-items:center;
@@ -196,6 +212,20 @@ a.chip:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
 .shore-hut:after{content:"";position:absolute;left:9px;top:20px;width:16px;height:6px;
   border-left:2px solid #C9A47C;border-right:2px solid #C9A47C}
 
+/* 遠處：一艘小帆船慢慢漂過去，兩隻海鷗在上面滑翔。
+   兩者都在 .coastline-scene 裡，不吃滑鼠事件，也不會擋到貓狗的 canvas。 */
+.shore-boat{position:absolute;left:21%;bottom:36px;width:20px;height:15px;opacity:.46;
+  animation:drift 34s ease-in-out infinite alternate}
+.shore-boat i{position:absolute;left:9px;bottom:4px;width:0;height:0;
+  border-left:7px solid transparent;border-bottom:11px solid #6E9BBC}
+.shore-boat b{position:absolute;left:2px;bottom:0;width:16px;height:4px;
+  background:#6E9BBC;border-radius:0 0 6px 6px}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(30px)}}
+.shore-gulls{position:absolute;right:42%;bottom:46px;width:42px;opacity:.55;
+  animation:glide 15s ease-in-out infinite alternate}
+.shore-gulls path{fill:none;stroke:#5F86A5;stroke-width:1.6;stroke-linecap:round}
+@keyframes glide{from{transform:translate(0,0)}to{transform:translate(-20px,-7px)}}
+
 footer{background:var(--ink);color:var(--cream);align-items:center;gap:18px;
   padding:9px 3vw;font-size:11px;display:flex;flex-wrap:wrap}
 footer a{text-decoration:none}
@@ -211,6 +241,8 @@ footer span{opacity:.65;margin-left:auto}
   .hero p{text-align:left}
   .chips{justify-content:center}
   .sheet{padding:24px 14px 18px}
+  .doodle{display:none}
+  .ribbon .now{font-size:10px;letter-spacing:.06em}
   .sticker{transform:none}
   .sticker:nth-child(odd),.sticker:nth-child(even){transform:none}
   .social a{width:100%;justify-content:center}
@@ -228,7 +260,9 @@ footer span{opacity:.65;margin-left:auto}
     <a class="back" href="https://sandyliuportfolio.com/">Work portfolio →</a>
   </header>
 
-  <div class="ribbon">Off the clock</div>
+  <div class="ribbon">Off the clock
+    <span class="now"><i aria-hidden="true"></i><span id="clock">New Taipei</span></span>
+  </div>
 
   <div class="page">
 
@@ -238,13 +272,29 @@ footer span{opacity:.65;margin-left:auto}
         <div class="eyebrow">Dog · Cat · Water · Paperbacks · Parties · Music · Alcohol · Travel · Sunshine</div>
         <h2>Sandy Liu</h2>
         <div class="chips">
-          <span class="chip">New Taipei, Taiwan</span>
-          <a class="chip" href="https://www.instagram.com/iam.sandy_liu/" target="_blank" rel="noreferrer">@iam.sandy_liu</a>
+          <span class="chip">
+            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 21.5s7-6.3 7-11.5a7 7 0 1 0-14 0c0 5.2 7 11.5 7 11.5z"/>
+              <circle cx="12" cy="10" r="2.6"/>
+            </svg>New Taipei, Taiwan</span>
+          <a class="chip" href="https://www.instagram.com/iam.sandy_liu/" target="_blank" rel="noreferrer">
+            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="5"/>
+              <circle cx="12" cy="12" r="4"/>
+              <path d="M17.5 6.5h.01"/>
+            </svg>@iam.sandy_liu</a>
         </div>
       </div>
+      <svg class="doodle shell" viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M20 34C10 34 4 27 4 19S11 6 20 6s16 5 16 13-6 15-16 15z"/>
+        <path d="M20 34V6M20 34 9.5 11M20 34l10.5-23"/>
+      </svg>
     </section>
 
     <section class="sheet">
+      <svg class="doodle star" viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M20 4.5 25 15l11.5 1.6-8.4 8 2 11.4L20 30.6 9.9 36l2-11.4-8.4-8L15 15z"/>
+      </svg>
       <ul>
         <li class="sticker">
           <div class="die"><svg viewBox="0 0 100 100" aria-hidden="true">
@@ -420,6 +470,8 @@ footer span{opacity:.65;margin-left:auto}
       <span class="shore-sun"></span>
       <span class="shore-hut"><i></i><b></b></span>
       <span class="shore-palm"><i></i><i></i><i></i><i></i></span>
+      <span class="shore-boat"><i></i><b></b></span>
+      <svg class="shore-gulls" viewBox="0 0 42 14" aria-hidden="true"><path d="M2 8q4-5 7 0 3-5 7 0"/><path d="M24 5q3.5-4.5 6.5 0 3-4.5 6.5 0"/></svg>
       <svg class="shore-waves" viewBox="0 0 150 20" aria-hidden="true"><path d="M1 7c9-7 18 7 27 0s18 7 27 0 18 7 27 0 18 7 27 0 18 7 27 0"/><path d="M12 15c9-7 18 7 27 0s18 7 27 0 18 7 27 0 18 7 27 0"/></svg>
     </div>
     <canvas id="petCanvas" aria-hidden="true"></canvas>
@@ -432,6 +484,35 @@ footer span{opacity:.65;margin-left:auto}
     <span>© 2026 Sandy Liu</span>
   </footer>
 </main>
+
+<script>
+/* ── ribbon 右邊的當地時間 ────────────────────────────────────────
+   顯示新北現在幾點。只用瀏覽器內建的 Intl，沒有網路請求；
+   萬一環境不支援時區，就把整個小時鐘收起來，不留半截字。
+   要拿掉：刪掉這個 <script> 和 ribbon 裡的 <span class="now">。
+──────────────────────────────────────────────────────────────── */
+(function () {
+  var el = document.getElementById("clock");
+  if (!el) return;
+  var fmt;
+  try {
+    fmt = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Asia/Taipei", hour: "2-digit", minute: "2-digit", hour12: false
+    });
+    fmt.format(new Date());
+  } catch (e) {
+    var box = el.parentNode;
+    if (box) box.style.display = "none";
+    return;
+  }
+  function tick() {
+    el.textContent = "New Taipei " + fmt.format(new Date());
+    /* 對齊到下一個整分，時間不會晚一步才跳 */
+    setTimeout(tick, 60000 - (Date.now() % 60000) + 250);
+  }
+  tick();
+})();
+</script>
 
 <script>
 /* ── 頁尾寵物散步條 ─────────────────────────────────────────────
